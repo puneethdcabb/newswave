@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NewsWave — Global news, real-time</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+
+  <meta name="description" content="NewsWave — mobile-first global news aggregator using GNews API.">
+</head>
+<body x-data="newsApp()" x-init="init()" :class="darkMode ? 'dark' : ''">
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <!-- inline logo -->
+        <a href="#" class="logo" aria-label="NewsWave home">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="24" height="24" rx="6" fill="#d62828"></rect>
+            <path d="M6 12h12" stroke="#fff" stroke-width="1.5" stroke-linecap="round"></path>
+            <path d="M6 8h12" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity="0.7"></path>
+          </svg>
+          <span class="site-title">NewsWave</span>
+        </a>
+      </div>
+
+      <nav class="main-nav" aria-label="Primary">
+        <button class="nav-toggle" @click="toggleDrawer" aria-label="Open navigation" aria-expanded="false">☰</button>
+        <ul class="nav-links">
+          <li><a href="#world" @click.prevent="changeCategory('world')">World</a></li>
+          <li><a href="#technology" @click.prevent="changeCategory('technology')">Technology</a></li>
+          <li><a href="#business" @click.prevent="changeCategory('business')">Business</a></li>
+          <li><a href="#sports" @click.prevent="changeCategory('sports')">Sports</a></li>
+          <li><a href="#health" @click.prevent="changeCategory('health')">Health</a></li>
+          <li><a href="#science" @click.prevent="changeCategory('science')">Science</a></li>
+          <li><a href="#entertainment" @click.prevent="changeCategory('entertainment')">Entertainment</a></li>
+        </ul>
+        <div class="header-actions">
+          <button class="mode-toggle" @click="toggleDarkMode" aria-label="Toggle dark mode">🌙</button>
+        </div>
+      </nav>
+    </div>
+
+    <div class="nav-drawer" x-show="drawerOpen" @click.outside="drawerOpen=false" x-cloak>
+      <div class="drawer-inner">
+        <button class="drawer-close" @click="drawerOpen=false" aria-label="Close navigation">✕</button>
+        <ul>
+          <li><a href="#world" @click.prevent="changeCategory('world')">World</a></li>
+          <li><a href="#technology" @click.prevent="changeCategory('technology')">Technology</a></li>
+          <li><a href="#business" @click.prevent="changeCategory('business')">Business</a></li>
+          <li><a href="#sports" @click.prevent="changeCategory('sports')">Sports</a></li>
+          <li><a href="#health" @click.prevent="changeCategory('health')">Health</a></li>
+          <li><a href="#science" @click.prevent="changeCategory('science')">Science</a></li>
+          <li><a href="#entertainment" @click.prevent="changeCategory('entertainment')">Entertainment</a></li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <div class="sticky-search" x-bind:class="{'sticky': stickySearch}">
+    <div class="container search-inner">
+      <form @submit.prevent>
+        <label for="search" class="visually-hidden">Search news</label>
+        <input id="search" type="search" placeholder="Search headlines, e.g. climate, bitcoin..." @input="onSearchInput($event)" aria-label="Search news">
+        <div class="search-spinner" x-show="loading" aria-hidden="true"></div>
+      </form>
+    </div>
+  </div>
+
+  <main class="container main-content">
+    <section class="hero" aria-labelledby="hero-title">
+      <template x-if="featured">
+        <article class="hero-card" :style="featured.image ? 'background-image: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url(' + featured.image + ')' : ''">
+          <div class="hero-body">
+            <h2 id="hero-title" class="hero-title" x-text="featured.title"></h2>
+            <p class="meta"><span x-text="featured.source"></span> • <time x-text="featured.timeAgo"></time></p>
+            <div class="hero-actions">
+              <a :href="featured.url" target="_blank" rel="noopener noreferrer" class="btn">Read More</a>
+            </div>
+          </div>
+        </article>
+      </template>
+
+      <template x-if="!featured && loading">
+        <div class="hero-skeleton"></div>
+      </template>
+    </section>
+
+    <section class="news-grid" aria-live="polite">
+      <div class="grid" id="articles">
+        <!-- Cards injected by ui.js -->
+      </div>
+      <div class="load-more" x-show="!loading && !allLoaded">
+        <button @click="loadMore()" class="btn secondary">Load More</button>
+      </div>
+      <div id="scroll-sentinel"></div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span x-text="new Date().getFullYear()"></span> NewsWave. Powered by <a href="https://gnews.io" target="_blank" rel="noopener">GNews</a>.</p>
+      <button class="back-top" @click="scrollTop()" aria-label="Back to top">↑ Top</button>
+    </div>
+  </footer>
+
+  <!-- No Jekyll file to be added at root -->
+
+  <!-- Config & Scripts -->
+  <script src="config.js"></script>
+  <script src="js/utils.js" defer></script>
+  <script src="js/api.js" defer></script>
+  <script src="js/ui.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <!-- Load Alpine after app scripts so `newsApp()` is defined when Alpine initializes -->
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</body>
+</html>
