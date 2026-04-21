@@ -18,7 +18,7 @@
   async function topHeadlines({category='world', page=1, max=DEFAULT_MAX} = {}){
     // GNews supports 'topic' param for categories; if not, fallback to q
     const topic = category || 'world';
-    const url = `${API_BASE}/top-headlines?token=${API_KEY}&lang=${DEFAULT_LANG}&max=${max}&topic=${encodeURIComponent(topic)}`;
+    const url = `${API_BASE}/top-headlines?token=${API_KEY}&lang=${DEFAULT_LANG}&max=${max}&page=${page}&topic=${encodeURIComponent(topic)}`;
     const cacheKey = `top:${category}:${page}:${max}`;
     const cached = window.NWUtils.sessionCache(cacheKey);
     if(cached) return cached;
@@ -32,7 +32,7 @@
   }
 
   async function searchNews({q, page=1, max=DEFAULT_MAX} = {}){
-    const url = `${API_BASE}/search?q=${encodeURIComponent(q)}&token=${API_KEY}&lang=${DEFAULT_LANG}&max=${max}`;
+    const url = `${API_BASE}/search?q=${encodeURIComponent(q)}&token=${API_KEY}&lang=${DEFAULT_LANG}&max=${max}&page=${page}`;
     const cacheKey = `search:${q}:${page}:${max}`;
     const cached = window.NWUtils.sessionCache(cacheKey);
     if(cached) return cached;
