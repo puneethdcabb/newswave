@@ -78,7 +78,8 @@
     const app = window._NW_APP;
     if(app){
       app.featured = article;
-      app.featured.timeAgo = window.NWUtils.formatRelative(article.publishedAt || article.publishedAt);
+      app.featured.timeAgo   = window.NWUtils.formatRelative(article.publishedAt || new Date().toISOString());
+      app.featured.sourceName = (article.source && article.source.name) ? article.source.name : (article.source || '');
     }
   }
 

@@ -46,7 +46,8 @@ function newsApp(){
         } else {
           NWUI.renderArticles([], false, this.category);
         }
-        this.allLoaded = articles.length < 2;
+        // RSS feeds are one-shot — mark as fully loaded after the first fetch
+        this.allLoaded = true;
       }catch(err){
         NWUI.showError('Unable to load news. Please check your API key or network.', ()=>this.fetchCategory(this.category));
       }finally{ this.loading = false; }

@@ -80,7 +80,7 @@
         <article class="hero-card" :style="featured.image ? 'background-image: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url(' + featured.image + ')' : ''">
           <div class="hero-body">
             <h2 id="hero-title" class="hero-title" x-text="featured.title"></h2>
-            <p class="meta"><span x-text="featured.source"></span> • <time x-text="featured.timeAgo"></time></p>
+            <p class="meta"><span x-text="featured.sourceName"></span> • <time x-text="featured.timeAgo"></time></p>
             <div class="hero-actions">
               <a :href="featured.url" target="_blank" rel="noopener noreferrer" class="btn">Read More</a>
             </div>

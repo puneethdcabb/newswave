@@ -1,48 +1,76 @@
-// API wrapper for GNews
+// API wrapper — powered by rss2json.com (no API key required)
 (function(){
-  const { API_KEY, API_BASE } = window.GNEWS_CONFIG || {};
-  const DEFAULT_LANG = 'en';
+  const { RSS2JSON_BASE, RSS2JSON_KEY, CATEGORY_FEEDS, SEARCH_FEED } = window.GNEWS_CONFIG || {};
   const DEFAULT_MAX = 20;
 
-  async function fetchJSON(url){
-    try{
-      const res = await fetch(url);
-      if(!res.ok) throw new Error(`API ${res.status}`);
-      const json = await res.json();
-      return json;
-    }catch(err){
-      throw err;
-    }
+  // Strip HTML tags that BBC RSS sometimes includes in descriptions
+  function stripHtml(str){
+    return str ? str.replace(/<[^>]*>/g, '').trim() : '';
+  }
+
+  // Map an rss2json item array to the article shape the rest of the app expects
+  function normaliseItems(items, feedTitle){
+    return items.map(item => ({
+      title:       item.title || '',
+      description: stripHtml(item.description || ''),
+      content:     stripHtml(item.content     || ''),
+      url:         item.link || item.guid || '#',
+      // rss2json exposes thumbnail; enclosure.link is the fallback
+      image:       item.thumbnail || (item.enclosure && (item.enclosure.thumbnail || item.enclosure.link)) || null,
+      publishedAt: item.pubDate || new Date().toISOString(),
+      source: {
+        name: feedTitle || item.author || '',
+        url:  ''
+      }
+    }));
+  }
+
+  async function fetchFeed(rssUrl, count){
+    let url = `${RSS2JSON_BASE}?rss_url=${encodeURIComponent(rssUrl)}`;
+    if(RSS2JSON_KEY) url += `&api_key=${RSS2JSON_KEY}&count=${count}`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error(`rss2json ${res.status}`);
+    const json = await res.json();
+    // rss2json returns status:'ok' on success
+    if(json.status !== 'ok') throw new Error(json.message || 'Feed error');
+    return json;
   }
 
   async function topHeadlines({category='world', page=1, max=DEFAULT_MAX} = {}){
-    // GNews supports 'topic' param for categories; if not, fallback to q
-    const topic = category || 'world';
-    const url = `${API_BASE}/top-headlines?token=${API_KEY}&lang=${DEFAULT_LANG}&max=${max}&page=${page}&topic=${encodeURIComponent(topic)}`;
-    const cacheKey = `top:${category}:${page}:${max}`;
-    const cached = window.NWUtils.sessionCache(cacheKey);
+    // RSS feeds are not paginated — return empty for page > 1 so the
+    // app's IntersectionObserver sets allLoaded = true after the first load.
+    if(page > 1) return { totalArticles: 0, articles: [] };
+
+    const rssUrl   = CATEGORY_FEEDS[category] || CATEGORY_FEEDS.world;
+    const cacheKey = `top:${category}:${max}`;
+    const cached   = window.NWUtils.sessionCache(cacheKey);
     if(cached) return cached;
-    try{
-      const data = await fetchJSON(url);
-      window.NWUtils.sessionCache(cacheKey, data, 120);
-      return data;
-    }catch(err){
-      throw err;
-    }
+
+    const json     = await fetchFeed(rssUrl, max);
+    const articles = normaliseItems(json.items || [], json.feed && json.feed.title);
+    const result   = { totalArticles: articles.length, articles };
+    window.NWUtils.sessionCache(cacheKey, result, 120);
+    return result;
   }
 
   async function searchNews({q, page=1, max=DEFAULT_MAX} = {}){
-    const url = `${API_BASE}/search?q=${encodeURIComponent(q)}&token=${API_KEY}&lang=${DEFAULT_LANG}&max=${max}&page=${page}`;
-    const cacheKey = `search:${q}:${page}:${max}`;
-    const cached = window.NWUtils.sessionCache(cacheKey);
+    if(page > 1) return { totalArticles: 0, articles: [] };
+
+    const cacheKey = `search:${q}:${max}`;
+    const cached   = window.NWUtils.sessionCache(cacheKey);
     if(cached) return cached;
-    try{
-      const data = await fetchJSON(url);
-      window.NWUtils.sessionCache(cacheKey, data, 60);
-      return data;
-    }catch(err){
-      throw err;
-    }
+
+    // Fetch a broad general feed then filter client-side by the query string
+    const json     = await fetchFeed(SEARCH_FEED, 50);
+    const all      = normaliseItems(json.items || [], json.feed && json.feed.title);
+    const ql       = q.toLowerCase();
+    const filtered = all.filter(a =>
+      (a.title + ' ' + a.description).toLowerCase().includes(ql)
+    ).slice(0, max);
+
+    const result = { totalArticles: filtered.length, articles: filtered };
+    window.NWUtils.sessionCache(cacheKey, result, 60);
+    return result;
   }
 
   window.NWApi = { topHeadlines, searchNews };
