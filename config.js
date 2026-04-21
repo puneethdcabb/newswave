@@ -17,7 +17,4 @@ const CATEGORY_FEEDS = {
   entertainment: 'https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml'
 };
 
-// Broad feed used for search (client-side filtering)
-const SEARCH_FEED = 'https://feeds.bbci.co.uk/news/rss.xml';
-
-window.GNEWS_CONFIG = { RSS2JSON_BASE, RSS2JSON_KEY, CATEGORY_FEEDS, SEARCH_FEED };
+window.GNEWS_CONFIG = { RSS2JSON_BASE, RSS2JSON_KEY, CATEGORY_FEEDS };

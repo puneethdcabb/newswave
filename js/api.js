@@ -60,9 +60,21 @@
     const cached   = window.NWUtils.sessionCache(cacheKey);
     if(cached) return cached;
 
-    // Fetch a broad general feed then filter client-side by the query string
-    const json     = await fetchFeed(SEARCH_FEED, 50);
-    const all      = normaliseItems(json.items || [], json.feed && json.feed.title);
+    // Fetch ALL category feeds in parallel (free tier: ~10 items each × 7 feeds = ~70 articles)
+    // then filter client-side — no API key or count param needed.
+    const feedEntries = Object.entries(CATEGORY_FEEDS);
+    const results = await Promise.allSettled(
+      feedEntries.map(([, rssUrl]) => fetchFeed(rssUrl))
+    );
+    const seen = new Set();
+    const all  = [];
+    results.forEach((r, i) => {
+      if(r.status !== 'fulfilled') return;
+      const feedTitle = (r.value.feed && r.value.feed.title) || feedEntries[i][0];
+      normaliseItems(r.value.items || [], feedTitle).forEach(a => {
+        if(!seen.has(a.url)){ seen.add(a.url); all.push(a); }
+      });
+    });
     const ql       = q.toLowerCase();
     const filtered = all.filter(a =>
       (a.title + ' ' + a.description).toLowerCase().includes(ql)
