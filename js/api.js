@@ -1,6 +1,6 @@
 // API wrapper — powered by rss2json.com (no API key required)
 (function(){
-  const { RSS2JSON_BASE, RSS2JSON_KEY, CATEGORY_FEEDS, SEARCH_FEED } = window.GNEWS_CONFIG || {};
+  const { RSS2JSON_BASE, RSS2JSON_KEY, CATEGORY_FEEDS } = window.NW_CONFIG || {};
   const DEFAULT_MAX = 20;
 
   // Strip HTML tags that BBC RSS sometimes includes in descriptions

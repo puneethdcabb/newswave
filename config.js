@@ -17,4 +17,4 @@ const CATEGORY_FEEDS = {
   entertainment: 'https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml'
 };
 
-window.GNEWS_CONFIG = { RSS2JSON_BASE, RSS2JSON_KEY, CATEGORY_FEEDS };
+window.NW_CONFIG = { RSS2JSON_BASE, RSS2JSON_KEY, CATEGORY_FEEDS };
