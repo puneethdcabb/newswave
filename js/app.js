@@ -35,6 +35,7 @@ function newsApp(){
       location.hash = this.category;
       this.page = 1;
       this.loading = true;
+      NWUI.clearError();
       NWUI.renderSkeletons(6);
       try{
         const data = await NWApi.topHeadlines({category: this.category, page: this.page});
@@ -57,6 +58,7 @@ function newsApp(){
       if(this.loading || this.allLoaded) return;
       this.page += 1;
       this.loading = true;
+      NWUI.clearError();
       try{
         const data = await NWApi.topHeadlines({category: this.category, page: this.page});
         const articles = data?.articles || [];
@@ -71,6 +73,7 @@ function newsApp(){
 
     async search(q){
       this.loading = true;
+      NWUI.clearError();
       NWUI.renderSkeletons(4);
       try{
         const data = await NWApi.searchNews({q});
@@ -79,6 +82,7 @@ function newsApp(){
           NWUI.renderArticles([]);
           NWUI.showError(`No results found for "${q}"`);
         } else {
+          NWUI.clearError();
           this.featured = articles[0];
           NWUI.renderHero(this.featured);
           NWUI.renderArticles(articles.slice(1), false, this.category);

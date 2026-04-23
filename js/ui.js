@@ -93,9 +93,13 @@
     }
   }
 
-  function showError(message, retryFn){
+  function clearError(){
     const existing = document.querySelector('.error-banner');
     if(existing) existing.remove();
+  }
+
+  function showError(message, retryFn){
+    clearError();
     const banner = document.createElement('div');
     banner.className = 'error-banner';
     banner.style.background = 'var(--primary)';
@@ -116,5 +120,5 @@
     main.insertBefore(banner, main.firstChild);
   }
 
-  window.NWUI = { renderArticles, renderHero, renderSkeletons, showError };
+  window.NWUI = { renderArticles, renderHero, renderSkeletons, showError, clearError };
 })();
