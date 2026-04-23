@@ -8,6 +8,14 @@
     return str ? str.replace(/<[^>]*>/g, '').trim() : '';
   }
 
+  function upgradeImageUrl(url){
+    if(!url) return null;
+    if(url.includes('ichef.bbci.co.uk/ace/standard/')){
+      return url.replace(/\/ace\/standard\/\d+\//, '/ace/standard/976/');
+    }
+    return url;
+  }
+
   // Map an rss2json item array to the article shape the rest of the app expects
   function normaliseItems(items, feedTitle){
     return items.map(item => ({
@@ -16,7 +24,7 @@
       content:     stripHtml(item.content     || ''),
       url:         item.link || item.guid || '#',
       // rss2json exposes thumbnail; enclosure.link is the fallback
-      image:       item.thumbnail || (item.enclosure && (item.enclosure.thumbnail || item.enclosure.link)) || null,
+      image:       upgradeImageUrl(item.thumbnail || (item.enclosure && (item.enclosure.thumbnail || item.enclosure.link)) || null),
       publishedAt: item.pubDate || new Date().toISOString(),
       source: {
         name: feedTitle || item.author || '',
