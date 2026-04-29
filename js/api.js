@@ -16,6 +16,11 @@
     return url;
   }
 
+  function getFeedUrls(category){
+    const feeds = CATEGORY_FEEDS[category] || CATEGORY_FEEDS.world;
+    return Array.isArray(feeds) ? feeds : [feeds];
+  }
+
   // Map an rss2json item array to the article shape the rest of the app expects
   function normaliseItems(items, feedTitle){
     return items.map(item => ({
@@ -44,17 +49,29 @@
     return json;
   }
 
+  async function fetchFirstAvailableFeed(feedUrls, count){
+    let lastError;
+    for(const rssUrl of feedUrls){
+      try{
+        return await fetchFeed(rssUrl, count);
+      }catch(err){
+        lastError = err;
+      }
+    }
+    throw lastError || new Error('Feed error');
+  }
+
   async function topHeadlines({category='world', page=1, max=DEFAULT_MAX} = {}){
     // RSS feeds are not paginated — return empty for page > 1 so the
     // app's IntersectionObserver sets allLoaded = true after the first load.
     if(page > 1) return { totalArticles: 0, articles: [] };
 
-    const rssUrl   = CATEGORY_FEEDS[category] || CATEGORY_FEEDS.world;
+    const feedUrls = getFeedUrls(category);
     const cacheKey = `top:${category}:${max}`;
     const cached   = window.NWUtils.sessionCache(cacheKey);
     if(cached) return cached;
 
-    const json     = await fetchFeed(rssUrl, max);
+    const json     = await fetchFirstAvailableFeed(feedUrls, max);
     const articles = normaliseItems(json.items || [], json.feed && json.feed.title);
     const result   = { totalArticles: articles.length, articles };
     window.NWUtils.sessionCache(cacheKey, result, 120);
@@ -72,7 +89,7 @@
     // then filter client-side — no API key or count param needed.
     const feedEntries = Object.entries(CATEGORY_FEEDS);
     const results = await Promise.allSettled(
-      feedEntries.map(([, rssUrl]) => fetchFeed(rssUrl))
+      feedEntries.map(([category]) => fetchFirstAvailableFeed(getFeedUrls(category)))
     );
     const seen = new Set();
     const all  = [];

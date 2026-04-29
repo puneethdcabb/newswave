@@ -11,7 +11,10 @@ const CATEGORY_FEEDS = {
   world:         'https://feeds.bbci.co.uk/news/world/rss.xml',
   technology:    'https://feeds.bbci.co.uk/news/technology/rss.xml',
   business:      'https://feeds.bbci.co.uk/news/business/rss.xml',
-  sports:        'https://feeds.bbci.co.uk/news/sport/rss.xml',
+  sports:        [
+    'https://feeds.bbci.co.uk/news/sport/rss.xml',
+    'https://feeds.bbci.co.uk/sport/rss.xml'
+  ],
   health:        'https://feeds.bbci.co.uk/news/health/rss.xml',
   science:       'https://feeds.bbci.co.uk/news/science_and_environment/rss.xml',
   entertainment: 'https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml'
