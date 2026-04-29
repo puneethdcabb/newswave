@@ -19,6 +19,8 @@
     img.className = 'thumb';
     img.alt = article.image ? (article.title || 'Article image') : `${category} placeholder`;
     img.src = article.image || placeholder;
+    img.loading = 'lazy';
+    img.decoding = 'async';
     img.onerror = ()=>{ img.src = placeholder };
 
     const body = document.createElement('div');

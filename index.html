@@ -5,14 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>NewsWave — Global news, real-time</title>
 
+  <!-- Preload critical CSS -->
+  <link rel="preload" href="css/style.css" as="style">
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
   <!-- Styles -->
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/animations.css">
+
+  <meta name="theme-color" content="#d62828">
 
   <meta name="description" content="NewsWave — mobile-first global news aggregator powered by BBC RSS feeds.">
 </head>
@@ -121,6 +126,6 @@
   <script src="js/ui.js" defer></script>
   <script src="js/app.js" defer></script>
   <!-- Load Alpine after app scripts so `newsApp()` is defined when Alpine initializes -->
-  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script src="https://unpkg.com/alpinejs@3.14.9/dist/cdn.min.js" defer></script>
 </body>
 </html>

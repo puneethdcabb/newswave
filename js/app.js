@@ -24,10 +24,17 @@ function newsApp(){
         if(q.length===0){ this.fetchCategory(this.category); return; }
         this.search(q);
       },500);
-      // sticky search on scroll
+      // sticky search on scroll (passive for perf)
+      let ticking = false;
       window.addEventListener('scroll', ()=>{
-        this.stickySearch = window.scrollY > 80;
-      });
+        if(!ticking){
+          requestAnimationFrame(()=>{
+            this.stickySearch = window.scrollY > 80;
+            ticking = false;
+          });
+          ticking = true;
+        }
+      }, {passive: true});
     },
 
     async fetchCategory(cat){
