@@ -5,23 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>NewsWave — Global news, real-time</title>
 
-  <!-- Preload critical CSS -->
+  <!-- Preload render-critical CSS so the browser discovers it earlier. -->
   <link rel="preload" href="css/style.css" as="style">
 
-  <!-- Fonts -->
+  <!-- Preconnects reduce connection setup time for font and script CDNs. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="dns-prefetch" href="https://api.rss2json.com">
+  <link rel="dns-prefetch" href="https://ichef.bbci.co.uk">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Playfair+Display:wght@700&amp;display=swap" rel="stylesheet">
 
   <!-- Styles -->
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/animations.css">
+  <link rel="preload" href="css/animations.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="css/animations.css"></noscript>
 
   <meta name="theme-color" content="#d62828">
 
   <meta name="description" content="NewsWave — mobile-first global news aggregator powered by BBC RSS feeds.">
+  <!-- Host-level cache headers should prefer long max-age for versioned CSS/JS/assets and short cache for index.html. -->
 </head>
-<body x-data="newsApp()" x-init="init()" :class="darkMode ? 'dark' : ''">
+<body x-data="newsApp()" x-init="init()" x-bind:class="darkMode ? 'dark' : ''">
   <header class="site-header">
     <div class="container header-inner">
       <div class="brand">
@@ -37,7 +42,7 @@
       </div>
 
       <nav class="main-nav" aria-label="Primary">
-        <button class="nav-toggle" @click="toggleDrawer" aria-label="Open navigation" aria-expanded="false">☰</button>
+        <button class="nav-toggle" @click="toggleDrawer" aria-label="Open navigation" x-bind:aria-expanded="drawerOpen.toString()">☰</button>
         <ul class="nav-links">
           <li><a href="#world" @click.prevent="changeCategory('world')">World</a></li>
           <li><a href="#technology" @click.prevent="changeCategory('technology')">Technology</a></li>
@@ -53,7 +58,7 @@
       </nav>
     </div>
 
-    <div class="nav-drawer" x-show="drawerOpen" @click.outside="drawerOpen=false" x-cloak>
+    <div class="nav-drawer" x-show="drawerOpen" x-bind:class="{'open': drawerOpen}" @click.outside="drawerOpen=false" x-cloak>
       <div class="drawer-inner">
         <button class="drawer-close" @click="drawerOpen=false" aria-label="Close navigation">✕</button>
         <ul>
@@ -73,7 +78,7 @@
     <div class="container search-inner">
       <form @submit.prevent>
         <label for="search" class="visually-hidden">Search news</label>
-        <input id="search" type="search" placeholder="Search headlines, e.g. climate, bitcoin..." @input="onSearchInput($event)" aria-label="Search news">
+        <input id="search" type="search" placeholder="Search headlines, e.g. climate, bitcoin..." autocomplete="off" enterkeyhint="search" @input="onSearchInput($event)" aria-label="Search news">
         <div class="search-spinner" x-show="loading" aria-hidden="true"></div>
       </form>
     </div>
@@ -82,12 +87,12 @@
   <main class="container main-content">
     <section class="hero" aria-labelledby="hero-title">
       <template x-if="featured">
-        <article class="hero-card" :style="featured.image ? 'background-image: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url(' + featured.image + ')' : ''">
+        <article class="hero-card" x-bind:style="featured.image ? 'background-image: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url(' + featured.image + ')' : ''">
           <div class="hero-body">
             <h2 id="hero-title" class="hero-title" x-text="featured.title"></h2>
             <p class="meta"><span x-text="featured.sourceName"></span> • <time x-text="featured.timeAgo"></time></p>
             <div class="hero-actions">
-              <a :href="featured.url" target="_blank" rel="noopener noreferrer" class="btn">Read More</a>
+              <a x-bind:href="featured.url" target="_blank" rel="noopener noreferrer" class="btn">Read More</a>
             </div>
           </div>
         </article>
@@ -98,7 +103,7 @@
       </template>
     </section>
 
-    <section class="news-grid" aria-live="polite">
+    <section class="news-grid" aria-label="Latest articles" aria-live="polite">
       <div class="grid" id="articles">
         <!-- Cards injected by ui.js -->
       </div>
@@ -120,7 +125,7 @@
   <!-- No Jekyll file to be added at root -->
 
   <!-- Config & Scripts -->
-  <script src="config.js"></script>
+  <script src="config.js" defer></script>
   <script src="js/utils.js" defer></script>
   <script src="js/api.js" defer></script>
   <script src="js/ui.js" defer></script>

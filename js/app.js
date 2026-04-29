@@ -18,7 +18,6 @@ function newsApp(){
       this.setupScrollObserver();
       this.fetchCategory(this.category);
       // search input handling
-      const searchEl = document.getElementById('search');
       this.onSearchInput = NWUtils.debounce((e)=>{
         const q = e.target.value.trim();
         if(q.length===0){ this.fetchCategory(this.category); return; }

@@ -1,11 +1,9 @@
-/* Loading skeletons, transitions, hover effects */
+/* Loading skeletons and lightweight transitions use transform/opacity for smoother rendering. */
 .hero-skeleton{border-radius:var(--radius, 14px);overflow:hidden}
 .card-skeleton{background:linear-gradient(90deg,var(--border, #e5e7eb),var(--surface, #fff),var(--border, #e5e7eb));background-size:200% 100%;animation:shimmer 1.4s linear infinite;height:260px;border-radius:var(--radius, 14px)}
-.skeleton-line{height:12px;background:rgba(0,0,0,0.04);margin:8px 0;border-radius:6px}
-.dark .skeleton-line{background:rgba(255,255,255,0.06)}
 
 /* Smooth fade-in for content loaded */
-.fade-in{animation:fadeIn 0.5s cubic-bezier(0.4,0,0.2,1) both}
+.fade-in{animation:fadeIn 280ms ease-out both}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
 /* Staggered card entry */
@@ -18,4 +16,4 @@
 
 /* Spinner rotation */
 .search-spinner{animation:spin 0.8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes spin{to{transform:translateY(-50%) rotate(360deg)}}

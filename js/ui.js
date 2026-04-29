@@ -21,6 +21,8 @@
     img.src = article.image || placeholder;
     img.loading = 'lazy';
     img.decoding = 'async';
+    img.width = 976;
+    img.height = 549;
     img.onerror = ()=>{ img.src = placeholder };
 
     const body = document.createElement('div');
@@ -69,10 +71,12 @@
   function renderArticles(list, append=false, category='world'){
     const root = document.getElementById(ARTICLES_ROOT_ID);
     if(!append) root.innerHTML = '';
+    const fragment = document.createDocumentFragment();
     list.forEach(a => {
       const card = createCard(a, category);
-      root.appendChild(card);
+      fragment.appendChild(card);
     });
+    root.appendChild(fragment);
   }
 
   function renderHero(article){
